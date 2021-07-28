@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="post">{% csrf_token %} </form>
+<h1>Página inicial</h1>
+{{ user.is_authenticated }}
+
+<h2>Vagas disponíveis</h2>
+{% if vagas %}
+
+    {% for vaga in vagas %}
+        <li><a href="{% url 'vagas:home' question.id %}">{{ vaga.empresa }}</a></li>
+    {% endfor %}
+
+{% else %}
+    <h5>Desculpe, não há vagas disponíveis</h5>
+{% endif %}
+
+<hr width=100%>
+
+    <a href="{% url 'vagas:curriculum' %}"> <button> Meu Curriculo </button></a>
+
+</body>
+</html>
