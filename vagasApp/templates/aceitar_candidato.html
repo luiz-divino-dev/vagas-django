@@ -12,13 +12,8 @@
 </head>
 <body>
 <form method="post">{% csrf_token %} </form>
-<h1>Página inicial</h1>
+<h1>Gerenciamento de vagas</h1>
 
-{% if  vagas %}
-<h2>Vagas disponíveis</h2>
-  {% else %}
-  <h2 style="color: red">Vagas indisponíveis</h2>
-{% endif %}
 {#{% if vagas %}#}
 {##}
 {#  {% for vaga in vagas %}#}
@@ -30,27 +25,29 @@
 {#{% endif %}#}
 
 <hr width=100%>
-
-<a href="{% url 'vagas:curriculum' %}">
-  <button> Meu Curriculo</button>
-</a>
+{##}
+{#<a href="{% url 'vagas:curriculum' %}">#}
+{#  <button> Meu Curriculo</button>#}
+{#</a>#}
 
 <!------ Include the above in your HEAD tag ---------->
 
 <div class="container">
   <div id="blog" class="row">
 
-    {% if  vagas %}
+    {% if  lista %}
 
-        {% for vaga in vagas %}
+        {% for ls in lista %}
         <div class="col-md-10 blogShort">
-          <h1> Cod: {{ vaga.id }} <br> Empresa: {{ vaga.empresa }}</h1>
-          <img src="{% static "favicon.ico" %}" style="width:20px; height: 20px;" alt="post img"
-               class="pull-left img-responsive thumb margin10 img-thumbnail">
+          <h4>Empresa: {{ ls.vaga.empresa }}<br>Cargo: {{ ls.vaga.cargo }}<br>Cod: {{ ls.vaga.id }}</h4>
+{#          <img src="{% static "favicon.ico" %}" style="width:20px; height: 20px;" alt="post img"#}
+{#               class="pull-left img-responsive thumb margin10 img-thumbnail">#}
           <article><p>
-            {{ vaga.descricao }}
+           {% for curriculo in ls.curriculos %}
+            Nome: {{ curriculo.nome_curriculum }}<br>Formação: {{ curriculo.area_formacao }}<br>
+            Grau de instrsução: {{ curriculo.grau_de_instrucao }}
+           {% endfor %}
           </p></article>
-
         </div>
         {#        <li><a href="{% url 'vagas:home' question.id %}">{{ vaga.empresa }}</a></li>#}
       {% endfor %}
@@ -59,7 +56,11 @@
       <h5>Desculpe, não há vagas disponíveis</h5>
     {% endif %}
 
-
+{% if messages %}
+  {% for message in messsages %}
+    <h4 class="{{ message.tags }}"> {{ message }}</h4>
+  {% endfor %}
+  {% endif %}
 
 </div>
 <div class="container">
@@ -69,8 +70,12 @@
         <div class="card-body">
           <form action="." method="POST" autocomplete="off">  {% csrf_token %}
             <div class="form-group">
-              <label for="username"> Código da vaga a se candidatar </label>
-              <input id="username" type="text" class="form-control" name="cod_vaga">
+              <label for="name">Nome do candidato</label>
+              <input id="name" type="text" class="form-control" name="nome_candidato">
+            </div>
+            <div class="form-group">
+              <label for="cod">Codigo da vaga</label>
+              <input id="cod" type="text" class="form-control" name="cod_vaga">
             </div>
             <button type="submit" id="sendlogin" class="btn btn-primary">Candidatar</button>
           </form>

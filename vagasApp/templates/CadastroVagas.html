@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="height:100vh">
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <form action="." method="POST" autocomplete="off">  {% csrf_token %}
+                        <div class="form-group">
+                            <label for="username"> Empresa </label>
+                            <input id="username" type="text" class="form-control" name="empresa">
+                        </div>
+                        <div class="form-group">
+                            <label for="password1">Cargo</label>
+                            <input id="password1" type="password" class="form-control" name="cargo">
+                        </div>
+                        <button type="submit" id="sendvagas" class="btn btn-primary">Cadastrar vaga</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário de Login</title>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+
+<div class="container">
+  <div class="row justify-content-center align-items-center" style="height:100vh">
+    <div class="col-4">
+      <div class="card">
+        <div class="card-body">
+          <form action="." method="POST" autocomplete="off">  {% csrf_token %}
+            <div class="form-group">
+              <label for="username"> Usuário </label>
+              <input id="username" type="text" class="form-control" name="username">
+            </div>
+            <div class="form-group">
+              <label for="password1">Senha</label>
+              <input id="password1" type="password" class="form-control" name="password1">
+            </div>
+            <button type="submit" id="sendlogin" class="btn btn-primary">login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
+<!--
+<form method="post">{#% csrf_token %#}
+-->

@@ -1,5 +1,5 @@
 from django import forms
-from vagasApp.models import Candidato, vagas, Curriculum
+from vagasApp.models import Candidato, Vagas, Curriculum
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 # ctrl+ shift mover linha
 # form de registro User
 class UserForm(UserCreationForm):
-    #email = forms.EmailField(required=True)
+    # email = forms.EmailField(required=True)
     class Meta:
         model = User
         fields = ['username', 'password1', 'password2']
@@ -31,16 +31,17 @@ class CurriculumForm(forms.ModelForm):
         model = Curriculum
         fields = ['area_formacao', 'nome_curriculum', 'grau_de_instrucao']
 
+
 class CurriculumRegisterForm(forms.ModelForm):
     class Meta:
         model = Curriculum
         fields = ['area_formacao', 'nome_curriculum', 'grau_de_instrucao', 'candidato']
 
 
-
-# class VagasForm(forms.ModelForm):
-#     class Meta:
-#         model = vagas
+class VagasForm(forms.ModelForm):
+    class Meta:
+        model = Vagas
+        fields = ['empresa', 'cargo', 'descricao']
 
 
 # class CandidatoFormLogin(forms.ModelForm):

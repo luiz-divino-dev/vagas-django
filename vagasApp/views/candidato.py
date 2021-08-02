@@ -1,9 +1,11 @@
 from django import views
 from django.db import transaction
 from django.shortcuts import render, redirect
-from vagasApp.forms import CandidatoFormRegister, UserForm, CurriculumForm
+from django.urls import reverse_lazy
+
+from vagasApp.forms import CandidatoFormRegister, UserForm, CurriculumForm, VagasForm
 from vagasApp.forms.candidato import CurriculumRegisterForm
-from vagasApp.models import Curriculum, Candidato
+from vagasApp.models import Curriculum, Candidato, Vagas
 # from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
@@ -49,7 +51,7 @@ class CandidatoViewRegister(views.View):
 
 
 class CandidatoViewLogin(views.View):
-    template_name = 'CandidatoLoginTemplate.html'
+    template_name = 'candidato_login_template.html'
 
     def get(self, request):
         return render(request, self.template_name)
@@ -78,7 +80,7 @@ class CandidatoViewLogin(views.View):
             if not user.is_superuser:
                 return redirect('vagas:homePage')
             else:
-                return redirect('vagas:SuperUserPage')
+                return redirect('vagas:home_super')
 
         else:
             messages.error(request, "Invalid username or password.")
@@ -92,12 +94,25 @@ class TemplateHome(generic.TemplateView):
 
 class HomePageCandidato(views.View):
     template_name = 'HomePage.html'
+    vagas = Vagas.objects.filter(status='D')
 
     def get(self, request):
-        return render(request, self.template_name)
+        return render(request, self.template_name, {'vagas': self.vagas})
 
-    # def post(self, request):
-    #    pass
+    def post(self, request):
+        cod = request.POST['cod_vaga']
+        usuario = request.user
+        candidato = Candidato.objects.get(user=usuario.id)
+        if candidato.status == 'O':
+            messages.error(request,
+                           'você não pode se candidatar, pois já está ocupando ou se candidatando para uma vaga')
+            return render(request, self.template_name, {'vagas': self.vagas})
+        candidato.status = 'O'
+        vaga = Vagas.objects.get(id=cod)
+        vaga.candidato_apply_id = candidato.id
+        vaga.save()
+        candidato.save()
+        return redirect('vagas:login')
 
 
 class CurriculumView(views.View):
@@ -149,5 +164,51 @@ class CurriculumView(views.View):
             messages.error(request, 'Falha no registro')
 
 
-class SuperUser(views.View):
-    pass
+class AceitarCandidato(views.View):
+    template_name = 'aceitar_candidato.html'
+    vagas = Vagas.objects.filter(candidato_apply_id__isnull=False, status='D')
+    # candidatos = Candidato.objects.filter('O')
+    # curriculim = Curriculum.objects.filter()
+
+    def get(self, request):
+        # usuario = request.user
+        lista = []
+        for vaga in self.vagas:
+            lista.append(
+                {
+                    'vaga': vaga,
+                    'curriculos': Curriculum.objects.filter(candidato__vagas=vaga)
+                }
+            )
+        return render(request, self.template_name, {'lista': lista})
+
+    def post(self, request):
+        cod = request.POST['cod_vaga']
+        nome = request.POST['nome_candidato']
+        candidato = Candidato.objects.get(nome_candidato=nome)
+        vaga = Vagas.objects.get(id=cod)
+        vaga.candidato_aceito_id = candidato.id
+        vaga.status = 'O'
+        vaga.save()
+        candidato.save()
+        messages.info(request, 'Candidato aceito na vaga')
+        return redirect('vagas:login')
+
+
+class HomeSuper(generic.TemplateView):
+    template_name = 'home_super.html'
+
+
+class SuperUser(CreateView):
+    template_name = 'SuperUserPage.html'
+    model = Vagas
+    fields = ['empresa', 'cargo', 'descricao']
+    success_url = reverse_lazy("vagas:homePage")
+    # def get(self, request):
+    #     render(request, self.template_name)
+    #
+    #
+    # def post(self, request):
+    #     form_vagas = VagasForm
+    #
+    #     form_vagas.is_valid()

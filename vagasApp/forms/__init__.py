@@ -1,1 +1,1 @@
-from .candidato import CandidatoFormRegister, UserForm, CurriculumForm
+from .candidato import CandidatoFormRegister, UserForm, CurriculumForm,VagasForm
