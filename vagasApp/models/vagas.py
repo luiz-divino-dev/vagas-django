@@ -8,8 +8,8 @@ class Vagas(models.Model):
     candidato_aceito = models.OneToOneField('Candidato', on_delete=models.CASCADE, blank=True, null=True,
                                             related_name='aceito')
     status = models.CharField(max_length=1, blank=True, null=True, default='D')
+    candidato_apply = models.ManyToManyField('Candidato', blank=True, null=True)
     # status : O 'ocupado', D 'disponível'
-    candidato_apply = models.ForeignKey('Candidato', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         pass

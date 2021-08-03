@@ -45,15 +45,16 @@
           <article><p>
            {% for curriculo in ls.curriculos %}
             Nome: {{ curriculo.nome_curriculum }}<br>Formação: {{ curriculo.area_formacao }}<br>
-            Grau de instrsução: {{ curriculo.grau_de_instrucao }}
+            Grau de instrsução: {{ curriculo.grau_de_instrucao }}<br>
            {% endfor %}
           </p></article>
         </div>
+{#          <hr width=10%>#}
         {#        <li><a href="{% url 'vagas:home' question.id %}">{{ vaga.empresa }}</a></li>#}
       {% endfor %}
 
     {% else %}
-      <h5>Desculpe, não há vagas disponíveis</h5>
+      <h5>Não há candidatos</h5>
     {% endif %}
 
 {% if messages %}
@@ -86,5 +87,6 @@
 </div>
 {#<a class="btn btn-blog pull-right marginBottom10"#}
 {#             href="vagas:apply">Candidatar</a>#}
+</div>
 </body>
 </html>

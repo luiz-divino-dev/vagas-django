@@ -8,17 +8,17 @@
   <link rel="shortcut icon" href="{% static "/favicon.ico" %}"/>
   <link rel="stylesheet" href="{% static 'HomePage.css' %}">
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>Home Page</title>
 </head>
 <body>
 <form method="post">{% csrf_token %} </form>
-<h1>Página inicial</h1>
-
-{% if  vagas %}
-<h2>Vagas disponíveis</h2>
-  {% else %}
-  <h2 style="color: red">Vagas indisponíveis</h2>
-{% endif %}
+<h1>{{ msg }}</h1>
+{##}
+{#{% if  vagas %}#}
+{#<h2>Vagas disponíveis</h2>#}
+{#  {% else %}#}
+{#  <h2 style="color: red">Vagas indisponíveis</h2>#}
+{#{% endif %}#}
 {#{% if vagas %}#}
 {##}
 {#  {% for vaga in vagas %}#}
@@ -34,21 +34,27 @@
 <a href="{% url 'vagas:curriculum' %}">
   <button> Meu Curriculo</button>
 </a>
-
+<form method="get">
+<label for="pesquisa" >Pesquise por uma vaga</label>
+<input id="pesquisa" type="text" name="pesquisa">
+<button type="submit" id="sendlogin" class="btn btn-primary">buscar</button>
+</form>
 <!------ Include the above in your HEAD tag ---------->
 
 <div class="container">
   <div id="blog" class="row">
 
-    {% if  vagas %}
+    {% if  lista %}
 
-        {% for vaga in vagas %}
+      {% for obj in lista %}
         <div class="col-md-10 blogShort">
-          <h1> Cod: {{ vaga.id }} <br> Empresa: {{ vaga.empresa }}</h1>
-          <img src="{% static "favicon.ico" %}" style="width:20px; height: 20px;" alt="post img"
+          <h1> Cod: {{ obj.vaga.id }} <br> Empresa: {{ obj.vaga.empresa }}</h1>
+          <img src="{{ obj.filme.Poster }}" style="width: 200px; height: 200px;" alt="post img"
                class="pull-left img-responsive thumb margin10 img-thumbnail">
           <article><p>
-            {{ vaga.descricao }}
+            {{ obj.vaga.descricao }}<br>
+            {{ obj.filme.Title }}<br>
+            {{ obj.filme.Plot }}
           </p></article>
 
         </div>
@@ -60,26 +66,31 @@
     {% endif %}
 
 
+  </div>
+  <div class="container">
+    <div class="row justify-content-center align-items-center" style="height:100vh">
+      <div class="col-4">
+        <div class="card">
+          <div class="card-body">
+            <form action="." method="POST" autocomplete="off">  {% csrf_token %}
+              <div class="form-group">
+                <label for="username"> Código da vaga a se candidatar </label>
+                <input id="username" type="text" class="form-control" name="cod_vaga">
+              </div>
+              <button type="submit" id="sendlogin" class="btn btn-primary">Candidatar</button>
+            </form>
+            {% for message in messages %}
+              <div class="alert alert-danger" style="margin-top: 2rem" role="alert">
+                {{ message }}
+              </div>
 
-</div>
-<div class="container">
-  <div class="row justify-content-center align-items-center" style="height:100vh">
-    <div class="col-4">
-      <div class="card">
-        <div class="card-body">
-          <form action="." method="POST" autocomplete="off">  {% csrf_token %}
-            <div class="form-group">
-              <label for="username"> Código da vaga a se candidatar </label>
-              <input id="username" type="text" class="form-control" name="cod_vaga">
-            </div>
-            <button type="submit" id="sendlogin" class="btn btn-primary">Candidatar</button>
-          </form>
+            {% endfor %}
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-{#<a class="btn btn-blog pull-right marginBottom10"#}
-{#             href="vagas:apply">Candidatar</a>#}
+  {#<a class="btn btn-blog pull-right marginBottom10"#}
+  {#             href="vagas:apply">Candidatar</a>#}
 </body>
 </html>

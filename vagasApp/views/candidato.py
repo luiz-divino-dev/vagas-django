@@ -12,6 +12,9 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.views import generic
 from django.views.generic.edit import CreateView
+import requests
+import json
+from django.db.models import Q
 
 
 # class
@@ -94,22 +97,67 @@ class TemplateHome(generic.TemplateView):
 
 class HomePageCandidato(views.View):
     template_name = 'HomePage.html'
-    vagas = Vagas.objects.filter(status='D')
+    pass
 
     def get(self, request):
-        return render(request, self.template_name, {'vagas': self.vagas})
+        vagas = Vagas.objects.filter(Q(status='D'))
+        pesquisa = request.GET.get('pesquisa')
+        if pesquisa:
+            vagas = vagas.filter(
+                Q(empresa__icontains=pesquisa) |
+                Q(cargo__icontains=pesquisa) |
+                Q(descricao__icontains=pesquisa)
+            )
+        jsons= []
+        for vaga in vagas:
+            requisicao = requests.get("http://www.omdbapi.com", {
+                "apikey": "e668b281",
+                "t": vaga.cargo
+            })
+            txt = requisicao.text
+            jsons.append(
+                {
+                    'vaga': vaga,
+                   "filme": json.loads(txt)
+                }
+            )
+        usuario = request.user
+        candidato = Candidato.objects.get(user=usuario)
+        if candidato.status == 'O':
+            return render(request, self.template_name,
+                          {'msg': 'Não há vagas disponíeis para você, pois já está ocupando uma'})
+        else:
+            return render(request, self.template_name, {'lista': jsons})
 
+
+    @transaction.atomic
     def post(self, request):
+        vagas = Vagas.objects.filter(status='D')
+        context = {
+            'msg': 'Você precisa ter um curriculo cadastrado para se candidatar à uma vaga',
+            'vagas': vagas
+        }
+        context2 = {
+            'msg': 'Código da vaga invalido',
+            'vagas': vagas
+        }
         cod = request.POST['cod_vaga']
         usuario = request.user
-        candidato = Candidato.objects.get(user=usuario.id)
-        if candidato.status == 'O':
-            messages.error(request,
-                           'você não pode se candidatar, pois já está ocupando ou se candidatando para uma vaga')
+        candidato = Candidato.objects.get(user=usuario)
+        # if candidato.status == 'O':
+        #     messages.error(request,
+        #                    'você não pode se candidatar, pois já está ocupando ou se candidatando para uma vaga')
+        #     return render(request, self.template_name, {'vagas': self.vagas})
+        # if not candidato.curriculum:
+        if not Curriculum.objects.filter(candidato=candidato):
+            return render(request, self.template_name, context)
+        try:
+            vaga = Vagas.objects.get(id=cod)
+        except ValueError:
+            messages.error(request, "Código inválido!")
             return render(request, self.template_name, {'vagas': self.vagas})
-        candidato.status = 'O'
-        vaga = Vagas.objects.get(id=cod)
-        vaga.candidato_apply_id = candidato.id
+
+        vaga.candidato_apply.add(candidato)
         vaga.save()
         candidato.save()
         return redirect('vagas:login')
@@ -165,8 +213,9 @@ class CurriculumView(views.View):
 
 
 class AceitarCandidato(views.View):
+    vagas = Vagas.objects.filter(status='D').exclude(candidato_apply=None)
     template_name = 'aceitar_candidato.html'
-    vagas = Vagas.objects.filter(candidato_apply_id__isnull=False, status='D')
+
     # candidatos = Candidato.objects.filter('O')
     # curriculim = Curriculum.objects.filter()
 
@@ -182,12 +231,14 @@ class AceitarCandidato(views.View):
             )
         return render(request, self.template_name, {'lista': lista})
 
+    @transaction.atomic
     def post(self, request):
         cod = request.POST['cod_vaga']
         nome = request.POST['nome_candidato']
         candidato = Candidato.objects.get(nome_candidato=nome)
         vaga = Vagas.objects.get(id=cod)
         vaga.candidato_aceito_id = candidato.id
+        candidato.status = 'O'
         vaga.status = 'O'
         vaga.save()
         candidato.save()
@@ -203,7 +254,7 @@ class SuperUser(CreateView):
     template_name = 'SuperUserPage.html'
     model = Vagas
     fields = ['empresa', 'cargo', 'descricao']
-    success_url = reverse_lazy("vagas:homePage")
+    success_url = reverse_lazy("vagas:login")
     # def get(self, request):
     #     render(request, self.template_name)
     #

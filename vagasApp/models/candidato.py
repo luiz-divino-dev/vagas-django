@@ -10,5 +10,6 @@ class Candidato(models.Model):
     status = models.CharField(max_length=1, blank=True, null=True, default='D')
     #status : O 'ocupado', D 'disponível'
 
+
     def __str__(self):
         return str(self.nome_candidato)
