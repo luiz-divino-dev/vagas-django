@@ -48,13 +48,14 @@
 
       {% for obj in lista %}
         <div class="col-md-10 blogShort">
-          <h1> Cod: {{ obj.vaga.id }} <br> Empresa: {{ obj.vaga.empresa }}</h1>
+          <h3> Cod: {{ obj.vaga.id }} <br> Empresa: {{ obj.vaga.empresa }}</h3>
           <img src="{{ obj.filme.Poster }}" style="width: 200px; height: 200px;" alt="post img"
                class="pull-left img-responsive thumb margin10 img-thumbnail">
           <article><p>
-            {{ obj.vaga.descricao }}<br>
-            {{ obj.filme.Title }}<br>
-            {{ obj.filme.Plot }}
+            Descrição da vaga: {{ obj.vaga.descricao }}<br><br>
+            Filme: {{ obj.filme.Title }}<br>
+            Enredo: {{ obj.filme.Plot }}<br>
+            Avaliação: {{ obj.filme.imdbRating}}
           </p></article>
 
         </div>
@@ -92,5 +93,6 @@
   </div>
   {#<a class="btn btn-blog pull-right marginBottom10"#}
   {#             href="vagas:apply">Candidatar</a>#}
+</div>
 </body>
 </html>

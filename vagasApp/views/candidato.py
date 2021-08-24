@@ -3,9 +3,10 @@ from django.db import transaction
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
+from utils.date_decorator import future_date
 from vagasApp.forms import CandidatoFormRegister, UserForm, CurriculumForm, VagasForm
 from vagasApp.forms.candidato import CurriculumRegisterForm
-from vagasApp.models import Curriculum, Candidato, Vagas
+from vagasApp.models import Curriculum, Candidato, Vaga
 # from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
@@ -100,7 +101,7 @@ class HomePageCandidato(views.View):
     pass
 
     def get(self, request):
-        vagas = Vagas.objects.filter(Q(status='D'))
+        vagas = Vaga.objects.filter(Q(status='D'))
         pesquisa = request.GET.get('pesquisa')
         if pesquisa:
             vagas = vagas.filter(
@@ -108,7 +109,7 @@ class HomePageCandidato(views.View):
                 Q(cargo__icontains=pesquisa) |
                 Q(descricao__icontains=pesquisa)
             )
-        jsons= []
+        jsons = []
         for vaga in vagas:
             requisicao = requests.get("http://www.omdbapi.com", {
                 "apikey": "e668b281",
@@ -118,7 +119,7 @@ class HomePageCandidato(views.View):
             jsons.append(
                 {
                     'vaga': vaga,
-                   "filme": json.loads(txt)
+                    "filme": json.loads(txt)
                 }
             )
         usuario = request.user
@@ -129,10 +130,9 @@ class HomePageCandidato(views.View):
         else:
             return render(request, self.template_name, {'lista': jsons})
 
-
     @transaction.atomic
     def post(self, request):
-        vagas = Vagas.objects.filter(status='D')
+        vagas = Vaga.objects.filter(status='D')
         context = {
             'msg': 'Você precisa ter um curriculo cadastrado para se candidatar à uma vaga',
             'vagas': vagas
@@ -152,7 +152,7 @@ class HomePageCandidato(views.View):
         if not Curriculum.objects.filter(candidato=candidato):
             return render(request, self.template_name, context)
         try:
-            vaga = Vagas.objects.get(id=cod)
+            vaga = Vaga.objects.get(id=cod)
         except ValueError:
             messages.error(request, "Código inválido!")
             return render(request, self.template_name, {'vagas': self.vagas})
@@ -213,7 +213,7 @@ class CurriculumView(views.View):
 
 
 class AceitarCandidato(views.View):
-    vagas = Vagas.objects.filter(status='D').exclude(candidato_apply=None)
+    vagas = Vaga.objects.filter(status='D').exclude(candidato_apply=None)
     template_name = 'aceitar_candidato.html'
 
     # candidatos = Candidato.objects.filter('O')
@@ -236,7 +236,7 @@ class AceitarCandidato(views.View):
         cod = request.POST['cod_vaga']
         nome = request.POST['nome_candidato']
         candidato = Candidato.objects.get(nome_candidato=nome)
-        vaga = Vagas.objects.get(id=cod)
+        vaga = Vaga.objects.get(id=cod)
         vaga.candidato_aceito_id = candidato.id
         candidato.status = 'O'
         vaga.status = 'O'
@@ -252,7 +252,7 @@ class HomeSuper(generic.TemplateView):
 
 class SuperUser(CreateView):
     template_name = 'SuperUserPage.html'
-    model = Vagas
+    model = Vaga
     fields = ['empresa', 'cargo', 'descricao']
     success_url = reverse_lazy("vagas:login")
     # def get(self, request):

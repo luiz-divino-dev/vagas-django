@@ -1,5 +1,5 @@
 from django import forms
-from vagasApp.models import Candidato, Vagas, Curriculum
+from vagasApp.models import Candidato, Vaga, Curriculum
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -40,7 +40,7 @@ class CurriculumRegisterForm(forms.ModelForm):
 
 class VagasForm(forms.ModelForm):
     class Meta:
-        model = Vagas
+        model = Vaga
         fields = ['empresa', 'cargo', 'descricao']
 
 

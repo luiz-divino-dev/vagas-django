@@ -9,6 +9,7 @@ class Candidato(models.Model):
     email = models.EmailField(max_length=255, blank=True)
     status = models.CharField(max_length=1, blank=True, null=True, default='D')
     #status : O 'ocupado', D 'disponível'
+    data_nascimento = models.DateField(blank=True, null=True)
 
 
     def __str__(self):
